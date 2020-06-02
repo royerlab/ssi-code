@@ -1,2 +1,2 @@
-# denoise-deconv
-Denoise and Deconvolve Paper
+# Noise-Tolerant Self-Supervised Inversion
+Noise-Tolerant Self-Supervised Inversion Paper
