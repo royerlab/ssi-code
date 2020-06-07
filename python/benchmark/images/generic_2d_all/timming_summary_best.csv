@@ -1,8 +1,0 @@
-method, training time, inference time
-Conjugate Gradient TV, 0.00, 95.74
-Chambole Pock TV , 0.00, 306.60
-Lucy Richardson $n=5$, 0.00, 0.23
-Lucy Richardson $n=10$, 0.00, 0.10
-Lucy Richardson $n=20$, 0.00, 0.17
-SSI UNet \emph{no masking}, 222.67, 0.03
-SSI UNet, 249.01, 0.03

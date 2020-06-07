@@ -8,7 +8,7 @@ from imageio import imread
 
 from it_ptcnn_deconv import PTCNNDeconvolution
 from lr_deconv import ImageTranslatorLRDeconv
-from models.autoencoder import AutoEncoder
+from models.unet import UNet
 from utils.io.datasets import normalise, add_poisson_gaussian_noise, add_microscope_blur_2d
 from utils.metrics.image_metrics import spectral_mutual_information, mutual_information, psnr, ssim
 
@@ -57,7 +57,7 @@ def demo(image_clipped):
         learning_rate=0.01,
         normaliser_type='identity',
         psf_kernel=psf_kernel,
-        model_class=AutoEncoder,
+        model_class=UNet,
         masking=True,
         masking_density=0.05,
         loss='l2',

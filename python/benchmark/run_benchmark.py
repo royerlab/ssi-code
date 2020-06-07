@@ -12,7 +12,7 @@ from skimage.transform import resize
 from benchmark.spectral import spectrum
 from it_ptcnn_deconv import PTCNNDeconvolution
 from lr_deconv import ImageTranslatorLRDeconv
-from models.autoencoder import AutoEncoder
+from models.unet import UNet
 from tv_restoration.chambole_pock import cp_restoration
 from tv_restoration.conjugate_gradient import cg_restoration
 from utils.io.datasets import normalise, add_microscope_blur_2d, add_poisson_gaussian_noise
@@ -35,7 +35,7 @@ def restore_ssi(image, psf_kernel, masking=True):
         learning_rate=0.01,
         normaliser_type='identity',
         psf_kernel=psf_kernel,
-        model_class=AutoEncoder,
+        model_class=UNet,
         masking=True,
         masking_density=0.05,
         loss='l2',
@@ -437,6 +437,8 @@ compute_averages('best', generic_2d_all_folder, methods=[restore_tv_cg,
                                                          restore_dl,
                                                          restore_ssi])  # restore_tv_cg
 
-# compute_spectra(generic_2d_all_folder, 'gt_numpy', 'gt_spectra')
-# compute_spectra(generic_2d_all_folder, 'blurrynoisy_numpy', 'blurrynoisy_spectra', add_prefix='blurrynoisy_')
-# compute_spectra(generic_2d_all_folder, 'restored_cache_numpy', 'restored_spectra')
+compute_spectra(generic_2d_all_folder, 'gt_numpy', 'gt_spectra')
+compute_spectra(generic_2d_all_folder, 'blurrynoisy_numpy', 'blurrynoisy_spectra', add_prefix='blurrynoisy_')
+compute_spectra(generic_2d_all_folder, 'restored_cache_numpy', 'restored_spectra')
+
+

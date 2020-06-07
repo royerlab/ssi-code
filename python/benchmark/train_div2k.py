@@ -7,7 +7,7 @@ import torch
 from tifffile import imread, imwrite
 
 from it_ptcnn_deconv import PTCNNDeconvolution
-from models.autoencoder import AutoEncoder
+from models.unet import UNet
 from utils.io.datasets import add_microscope_blur_2d, add_poisson_gaussian_noise
 
 
@@ -43,7 +43,7 @@ def demo(image):
         learning_rate=0.01,
         normaliser_type='identity',
         psf_kernel=psf_kernel,
-        model_class=AutoEncoder,
+        model_class=UNet,
         masking=True,
         masking_density=0.05,
         loss='l1'
