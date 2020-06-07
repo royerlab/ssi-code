@@ -1,0 +1,12 @@
+/gt_numpy/
+/gt_spectra/
+/gt_spectra_numpy/
+/restored/
+/restored_cache_numpy/
+/restored_spectra/
+/restored_spectra_numpy/
+/blurrynoisy_spectra_numpy/
+/blurrynoisy_spectra/
+/blurrynoisy_numpy/
+/blurrynoisy/
+/blurry/
