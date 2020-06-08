@@ -2,24 +2,23 @@ import csv
 import os
 import time
 from os.path import join, isfile, exists
-
 import matplotlib
 import numpy
 from PIL.Image import fromarray
 from imageio import imread
 from skimage.transform import resize
 
-from benchmark.spectral import spectrum
-from it_ptcnn_deconv import PTCNNDeconvolution
-from lr_deconv import ImageTranslatorLRDeconv
-from models.autoencoder import AutoEncoder
-from tv_restoration.chambole_pock import cp_restoration
-from tv_restoration.conjugate_gradient import cg_restoration
-from utils.io.datasets import normalise, add_microscope_blur_2d, add_poisson_gaussian_noise
-from utils.metrics.image_metrics import psnr, spectral_mutual_information, mutual_information, ssim
+from code.benchmark.spectral import spectrum
+from code.it_ptcnn_deconv import PTCNNDeconvolution
+from code.lr_deconv import ImageTranslatorLRDeconv
+from code.models.unet import UNet
+from code.tv_restoration.chambole_pock import cp_restoration
+from code.tv_restoration.conjugate_gradient import cg_restoration
+from code.utils.io.datasets import normalise, add_microscope_blur_2d, add_poisson_gaussian_noise
+from code.utils.metrics.image_metrics import psnr, ssim, mutual_information, spectral_mutual_information
 
 
-def save_png(filepath, image, rgb=False):
+def save_png(filepath, image):
     image = image.copy()
     image *= 255
     image = image.astype(numpy.uint8)
@@ -35,7 +34,7 @@ def restore_ssi(image, psf_kernel, masking=True):
         learning_rate=0.01,
         normaliser_type='identity',
         psf_kernel=psf_kernel,
-        model_class=AutoEncoder,
+        model_class=UNet,
         masking=True,
         masking_density=0.05,
         loss='l2',
@@ -183,16 +182,7 @@ def benchmark_on_image(run_name, folder, image_name, image, methods):
             restored_filepath = join(join(folder, 'restored'), f'{run_name}_{restore.__name__}_' + image_name)
             save_png(restored_filepath, restored_image)
 
-        # import napari
-        # with napari.gui_qt():
-        #     viewer = napari.Viewer()
-        #     viewer.add_image(image, name='image')
-        #     viewer.add_image(blurred_image, name='blurred')
-        #     for restored_image in restored_image_list:
-        #         viewer.add_image(restored_image, name='restored_image')
-
     # We compute scores:
-
     with open(join(folder, f"scores_{run_name}.tsv"), "a") as scores_file:
 
         blurred_psnr_value = psnr(image, blurred_image)
@@ -437,6 +427,8 @@ compute_averages('best', generic_2d_all_folder, methods=[restore_tv_cg,
                                                          restore_dl,
                                                          restore_ssi])  # restore_tv_cg
 
-# compute_spectra(generic_2d_all_folder, 'gt_numpy', 'gt_spectra')
-# compute_spectra(generic_2d_all_folder, 'blurrynoisy_numpy', 'blurrynoisy_spectra', add_prefix='blurrynoisy_')
-# compute_spectra(generic_2d_all_folder, 'restored_cache_numpy', 'restored_spectra')
+compute_spectra(generic_2d_all_folder, 'gt_numpy', 'gt_spectra')
+compute_spectra(generic_2d_all_folder, 'blurrynoisy_numpy', 'blurrynoisy_spectra', add_prefix='blurrynoisy_')
+compute_spectra(generic_2d_all_folder, 'restored_cache_numpy', 'restored_spectra')
+
+

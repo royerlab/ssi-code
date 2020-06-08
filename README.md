@@ -12,17 +12,7 @@ $ cd ssi-code
 #### Install the generic dependencies:
 ```bash
 $ pip install -r requirements.txt
-```
 
-#### Install CUDA specific dependencies:
-
-If you are using a conda environment:
-```bash
-$ conda install -c conda-forge cupy cudatoolkit
-```
-
-If you are NOT using a conda environment:
-```bash
 # (For CUDA 10.0)
 $ pip install cupy-cuda100
 
@@ -33,15 +23,19 @@ $ pip install cupy-cuda101
 $ pip install cupy-cuda102
 ```
 
-Make sure you have all CUDA drivers installed properly
+#### Install CUDA dependencies:
+
+If you are using a conda environment:
+```bash
+$ conda install cudatoolkit==CUDA_VERSION
+```
+
+If you are NOT using a conda environment make 
+sure you have all CUDA drivers installed properly
 on your system for the later options.
 
-
-
 #### Run the demo:
-```bash
-$ python code/demo/demo.py
-```
+You can find the demo in `code/demo/demo.py`.
 
 ## How to cite this work?
 

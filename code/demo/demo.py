@@ -7,7 +7,7 @@ import napari
 
 from code.it_ptcnn_deconv import PTCNNDeconvolution
 from code.lr_deconv import ImageTranslatorLRDeconv
-from code.models.autoencoder import AutoEncoder
+from code.models.unet import UNet
 from code.utils.io.datasets import normalise, add_microscope_blur_2d, add_poisson_gaussian_noise
 from code.utils.metrics.image_metrics import psnr, spectral_mutual_information, mutual_information, ssim
 
@@ -47,7 +47,7 @@ def demo(image_clipped):
         learning_rate=0.01,
         normaliser_type='identity',
         psf_kernel=psf_kernel,
-        model_class=AutoEncoder,
+        model_class=UNet,
         masking=True,
         masking_density=0.05,
         loss='l2',

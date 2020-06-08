@@ -1,136 +1,165 @@
-# Adapted from https://discuss.pytorch.org/t/unet-implementation/426
-
+import numpy
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
-from torch import nn
 
 
 class UNet(nn.Module):
-    def __init__(
-            self,
-            in_channels=1,
-            n_classes=2,
-            depth=4,
-            wf=3,
-            padding=True,
-            batch_norm=True,
-            up_mode='upsample',
-    ):
-        """
-        Implementation of
-        U-Net: Convolutional Networks for Biomedical Image Segmentation
-        (Ronneberger et al., 2015)
-        https://arxiv.org/abs/1505.04597
+    def __init__(self, n_input_channels, n_output_channels, mode='nearest', residual=False, kernel_regularisation=False, num_internal_channels=8):
+        super(UNet, self).__init__()
+        self.n_channels = n_input_channels
+        self.n_classes = n_output_channels
+        self.residual = residual
+        self.kernel_regularisation = kernel_regularisation
+        self.kernel = None
 
-        Using the default arguments will yield the exact version used
-        in the original paper
+        n = num_internal_channels
 
-        Args:
-            in_channels (int): number of input channels
-            n_classes (int): number of output channels
-            depth (int): depth of the network
-            wf (int): number of filters in the first layer is 2**wf
-            padding (bool): if True, apply padding such that the input shape
-                            is the same as the output.
-                            This may introduce artifacts
-            batch_norm (bool): Use BatchNorm after layers with an
-                               activation function
-            up_mode (str): one of 'upconv' or 'upsample'.
-                           'upconv' will use transposed convolutions for
-                           learned upsampling.
-                           'upsample' will use bilinear upsampling.
-        """
-        super().__init__()
-        assert up_mode in ('upconv', 'upsample')
-        self.padding = padding
-        self.depth = depth
-        prev_channels = in_channels
-        self.down_path = nn.ModuleList()
-        for i in range(depth):
-            self.down_path.append(
-                UNetConvBlock(prev_channels, 2 ** (wf + i), padding, batch_norm)
-            )
-            prev_channels = 2 ** (wf + i)
+        self.inc = DoubleConv(n_input_channels, n)
+        self.down1 = Down(n, n * 2)
+        self.down2 = Down(n * 2, n * 4)
+        self.down3 = Down(n * 4, n * 8)
+        factor = 2 if mode == 'bilinear' or mode == 'nearest' else 1
+        self.down4 = Down(n * 8, n * 16 // factor)
+        self.up1 = Up(n * 16, n * 8 // factor, mode)
+        self.up2 = Up(n * 8, n * 4 // factor, mode)
+        self.up3 = Up(n * 4, n * 2 // factor, mode)
+        self.up4 = Up(n * 2, n, mode)
+        self.outc = OutConv(n, n_output_channels)
 
-        self.up_path = nn.ModuleList()
-        for i in reversed(range(depth - 1)):
-            self.up_path.append(
-                UNetUpBlock(prev_channels, 2 ** (wf + i), up_mode, padding, batch_norm)
-            )
-            prev_channels = 2 ** (wf + i)
+    def forward(self, x0):
 
-        self.last = nn.Conv2d(prev_channels, n_classes, kernel_size=1)
+        x1 = self.inc(x0)
+        x2 = self.down1(x1)
+        x3 = self.down2(x2)
+        x4 = self.down3(x3)
+        x5 = self.down4(x4)
+        x = self.up1(x5, x4)
+        x = self.up2(x, x3)
+        x = self.up3(x, x2)
+        x = self.up4(x, x1)
+        x = self.outc(x)
 
-    def forward(self, x):
-        blocks = []
-        for i, down in enumerate(self.down_path):
-            x = down(x)
-            if i != len(self.down_path) - 1:
-                blocks.append(x)
-                x = F.max_pool2d(x, 2)
+        return x + x0 if self.residual else x
 
-        for i, up in enumerate(self.up_path):
-            x = up(x, blocks[-i - 1])
-
-        return self.last(x)
-
-        def enforce_blind_spot(self):
-            pass
+    def enforce_blind_spot(self):
+        pass
 
     def post_optimisation(self):
-        pass
+        b = 1e-5
+        if self.kernel_regularisation:
+            with torch.no_grad():
+                weights = self.outc.conv._parameters['weight']
+                num_channels = weights.shape[1]
+                if self.kernel is None:
+                    kernel = numpy.array([[b, b, b], [b, 1, b], [b, b, b]])
+                    kernel = kernel[numpy.newaxis, numpy.newaxis, ...].astype(
+                        numpy.float32
+                    )
+                    self.kernel = torch.from_numpy(kernel).to(weights.device)
+                    self.kernel /= self.kernel.sum()
+                    self.kernel = self.kernel.expand(num_channels, 1, -1, -1)
+
+                weights = F.conv2d(weights, self.kernel, groups=num_channels, padding=1)
+                self.outc.conv._parameters['weight'] = weights
 
     def fill_blind_spot(self):
+
         pass
+        # layer = self.inc.self.double_conv[0]
+        # weights = layer._parameters['weight']
+        # num_channels = weights.shape[1]
+        # original_sum = weights.sum()
+        # b = 1
+        # kernel = numpy.array([[b, b, b], [b, 0, b], [b, b, b]])
+        # kernel = kernel[numpy.newaxis, numpy.newaxis, ...].astype(numpy.float32)
+        # kernel = torch.from_numpy(kernel).to(weights.device)
+        # kernel /= kernel.sum()
+        # kernel = kernel.expand(num_channels, 1, -1, -1)
+        # filtered_weights = F.conv2d(weights, kernel, groups=num_channels, padding=1)
+        #
+        # indexes = tuple((i - 1) // 2 for i in layer.kernel_size)
+        # weights[:, :, indexes[0], indexes[1]] = filtered_weights[
+        #                                         :, :, indexes[0], indexes[1]
+        #                                         ]
+        # weights *= original_sum / weights.sum()
+        #
+        # layer._parameters['weight'] = weights
 
 
-class UNetConvBlock(nn.Module):
-    def __init__(self, in_size, out_size, padding, batch_norm):
-        super(UNetConvBlock, self).__init__()
-        block = []
+class DoubleConv(nn.Module):
+    """(convolution => [BN] => ReLU) * 2"""
 
-        block.append(nn.Conv2d(in_size, out_size, kernel_size=3, padding=int(padding)))
-        block.append(nn.ReLU())
-        if batch_norm:
-            block.append(nn.BatchNorm2d(out_size))
+    def __init__(self, in_channels, out_channels, mid_channels=None, reduce_rnd=False):
+        super().__init__()
+        if not mid_channels:
+            mid_channels = out_channels
+        self.double_conv = nn.Sequential(
+            nn.Conv2d(in_channels, mid_channels, kernel_size=5, padding=2),
+            nn.BatchNorm2d(mid_channels),
+            nn.ReLU(),
+            nn.Conv2d(mid_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU()
+        )
 
-        block.append(nn.Conv2d(out_size, out_size, kernel_size=3, padding=int(padding)))
-        block.append(nn.ReLU())
-        if batch_norm:
-            block.append(nn.BatchNorm2d(out_size))
-
-        self.block = nn.Sequential(*block)
+        if reduce_rnd:
+            alpha = 0.01
+            conv1 = self.double_conv[0]
+            conv2 = self.double_conv[3]
+            conv1.weight.data = alpha * conv1.weight.data
+            conv1.bias.data = alpha * conv1.bias.data
+            conv2.weight.data = alpha * conv2.weight.data
+            conv2.bias.data = alpha * conv2.bias.data
 
     def forward(self, x):
-        out = self.block(x)
-        return out
+        return self.double_conv(x)
 
 
-class UNetUpBlock(nn.Module):
-    def __init__(self, in_size, out_size, up_mode, padding, batch_norm):
-        super(UNetUpBlock, self).__init__()
-        if up_mode == 'upconv':
-            self.up = nn.ConvTranspose2d(in_size, out_size, kernel_size=2, stride=2)
-        elif up_mode == 'upsample':
-            self.up = nn.Sequential(
-                nn.Upsample(mode='nearest', scale_factor=2),
-                nn.Conv2d(in_size, out_size, kernel_size=1),
-            )
+class Down(nn.Module):
+    """Downscaling with maxpool then double conv"""
 
-        self.conv_block = UNetConvBlock(in_size, out_size, padding, batch_norm)
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+        self.maxpool_conv = nn.Sequential(
+            nn.MaxPool2d(2),
+            DoubleConv(in_channels, out_channels)
+        )
 
-    def center_crop(self, layer, target_size):
-        _, _, layer_height, layer_width = layer.size()
-        diff_y = (layer_height - target_size[0]) // 2
-        diff_x = (layer_width - target_size[1]) // 2
-        return layer[
-               :, :, diff_y: (diff_y + target_size[0]), diff_x: (diff_x + target_size[1])
-               ]
+    def forward(self, x):
+        return self.maxpool_conv(x)
 
-    def forward(self, x, bridge):
-        up = self.up(x)
-        crop1 = self.center_crop(bridge, up.shape[2:])
-        out = torch.cat([crop1, bridge], 1)
-        out = self.conv_block(out)
 
-        return out
+class Up(nn.Module):
+    """Upscaling then double conv"""
+
+    def __init__(self, in_channels, out_channels, mode='bilinear'):
+        super().__init__()
+
+        # if bilinear, use the normal convolutions to reduce the number of channels
+        if mode == 'bilinear' or mode == 'nearest':
+            self.up = nn.Upsample(scale_factor=2, mode=mode, align_corners=True if mode == 'bilinear' else None)
+            self.conv = DoubleConv(in_channels, out_channels, in_channels // 2, reduce_rnd=True)
+        else:
+            self.up = nn.ConvTranspose2d(in_channels, in_channels // 2, kernel_size=2, stride=2)
+            self.conv = DoubleConv(in_channels, out_channels, reduce_rnd=True)
+
+    def forward(self, x1, x2):
+        x1 = self.up(x1)
+        # input is CHW
+        diffY = x2.size()[2] - x1.size()[2]
+        diffX = x2.size()[3] - x1.size()[3]
+
+        x1 = F.pad(x1, [diffX // 2, diffX - diffX // 2,
+                        diffY // 2, diffY - diffY // 2])
+        x = torch.cat([x2, x1], dim=1)
+        return self.conv(x)
+
+
+class OutConv(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(OutConv, self).__init__()
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=1, padding=0, bias=True)
+
+    def forward(self, x):
+        return self.conv(x)
