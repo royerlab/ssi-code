@@ -54,7 +54,10 @@ python -m code.demo.demo
 
 ## How to cite this work?
 
-TBD
+Image Deconvolution via Noise-Tolerant Self-Supervised Inversion,
+Hirofumi Kobayashi, Ahmet Can Solak, Joshua Batson, Loic A. Royer,
+
+Arxiv submission pending.
 
 ## License
 
