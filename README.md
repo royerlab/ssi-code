@@ -1,5 +1,6 @@
 # Noise-Tolerant Self-Supervised Inversion
-Noise-Tolerant Self-Supervised Inversion Paper
+Noise-Tolerant Self-Supervised Inversion Paper.
+Here you can find our [full paper](paper/Noise_Tolerant_Self_Supervised_Inversion.pdf).
 
 ## Get started
 
