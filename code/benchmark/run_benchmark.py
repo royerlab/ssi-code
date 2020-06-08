@@ -397,9 +397,10 @@ def compute_spectra(folder, source_sub_folder, target_sub_folder, add_prefix='')
 
 def run_benchmark_on_folder(run_name, folder, methods=None):
     gt_folder = join(folder, 'gt')
-    files = [f for f in os.listdir(gt_folder) if isfile(join(gt_folder, f))]
+    files = [f for f in os.listdir(gt_folder) if isfile(join(gt_folder, f)) and '.png' in f]
 
     for image_name in files:
+        print(f"Reading gt image: {image_name}")
         gt_filepath = join(gt_folder, image_name)
         image = imread(gt_filepath)
         benchmark_on_image(run_name, folder, image_name, image, methods=methods)

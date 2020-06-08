@@ -10,3 +10,9 @@
 /blurrynoisy_numpy/
 /blurrynoisy/
 /blurry/
+/scores_best.tsv
+/scores_summary_best.csv
+/timming_best.tsv
+/timming_summary_best.csv
+/.~lock.scores_best.tsv\#
+/.~lock.timming_summary_best.csv\#
