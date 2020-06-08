@@ -1,6 +1,6 @@
 # Image Deconvolution via Noise-Tolerant Self-Supervised Inversion
 Image Deconvolution via Noise-Tolerant Self-Supervised Inversion Paper.
-Here you can find our [full paper](paper/Noise_Tolerant_Self_Supervised_Inversion.pdf).
+Here you can find our [full paper](https://royerlab.github.io/ssi-code/paper/Noise_Tolerant_Self_Supervised_Inversion.pdf).
 
 ## Authors
 
