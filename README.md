@@ -1,6 +1,16 @@
-# Noise-Tolerant Self-Supervised Inversion
-Noise-Tolerant Self-Supervised Inversion Paper.
+# Image Deconvolution via Noise-Tolerant Self-Supervised Inversion
+Image Deconvolution via Noise-Tolerant Self-Supervised Inversion Paper.
 Here you can find our [full paper](paper/Noise_Tolerant_Self_Supervised_Inversion.pdf).
+
+## Authors
+
+Hirofumi Kobayashi [@liilii_tweet](https://twitter.com/liilii_tweet)
+
+Ahmet Can Solak [@_ahmetcansolak](https://twitter.com/_ahmetcansolak)
+
+Joshua Batson [@thebasepoint](https://twitter.com/thebasepoint)
+
+Loic A. Royer [@loicaroyer](https://twitter.com/loicaroyer)
 
 ## Get started
 
