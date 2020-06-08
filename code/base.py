@@ -7,30 +7,16 @@ import psutil
 from code.utils.array.nd import nd_split_slices, remove_margin_slice
 from code.utils.log.log import lsection, lprint
 from code.utils.normaliser.identity import IdentityNormaliser
-from code.utils.normaliser.minmax import MinMaxNormaliser
-from code.utils.normaliser.percentile import PercentileNormaliser
 from code.utils.offcore.offcore import offcore_array
 
 
 class ImageTranslatorBase(ABC):
     """Image Translator base class
-
-    Parameters
-    ----------
-
-
-    Attributes
-    ----------
-
-
-    Notes
-    -----
-
     """
 
     def __init__(
             self,
-            normaliser_type='percentile',
+            normaliser_type='identity',
             normaliser_transform=None,
             normaliser_clip=True,
             monitor=None,
@@ -49,10 +35,6 @@ class ImageTranslatorBase(ABC):
         # Instantiates normaliser(s):
         if normaliser_type == 'identity':
             self.normalizer_class = IdentityNormaliser
-        elif normaliser_type == 'percentile':
-            self.normalizer_class = PercentileNormaliser
-        elif normaliser_type == 'minmax':
-            self.normalizer_class = MinMaxNormaliser
         else:
             raise ValueError('Unknown normalizer type passed!')
         self.normaliser_transform = normaliser_transform

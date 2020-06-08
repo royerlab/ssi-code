@@ -6,51 +6,6 @@ import numpy
 from numpy.lib.stride_tricks import as_strided
 
 
-def nd_range(start, stop, dims):
-    if not dims:
-        yield ()
-        return
-    for outer in nd_range(start, stop, dims - 1):
-        for inner in range(start, stop):
-            yield outer + (inner,)
-
-
-def nd_range_radii(radii):
-    if not radii:
-        yield ()
-        return
-
-    for outer in nd_range_radii(radii[:-1]):
-
-        radius = radii[-1]
-        start = -radius
-        stop = +radius + 1
-
-        for inner in range(start, stop):
-            yield outer + (inner,)
-
-
-def nd_range_bool_tuple(start, stop, dims):
-    if len(dims) == 0:
-        yield ()
-        return
-    for outer in nd_range_bool_tuple(start, stop, dims[:-1]):
-        if dims[-1]:
-            for inner in range(start, stop):
-                yield outer + (inner,)
-        else:
-            yield outer + ((start + stop) // 2,)
-
-
-def nd_loop(stops):
-    if not stops:
-        yield ()
-        return
-    for outer in nd_loop(stops[:-1]):
-        for inner in range(0, stops[-1]):
-            yield outer + (inner,)
-
-
 def nd_split_slices(array_shape, nb_slices, do_shuffle=False, margins=None):
     if not array_shape:
         yield ()
@@ -89,13 +44,15 @@ def remove_margin_slice(array_shape, slice_with_margin, slice_without_margin):
 
 
 def extract_tiles(arr, tile_size=8, extraction_step=1, flatten=False):
-    """Extracts patches of any n-dimensional array in place using strides.
+    """
+    Extracts patches of any n-dimensional array in place using strides.
     Given an n-dimensional array it will return a 2n-dimensional array with
     the first n dimensions indexing patch position and the last n indexing
     the patch content. This operation is immediate (O(1)). A reshape
     performed on the first n dimensions will cause numpy to copy data, leading
     to a list of extracted patches.
     Read more in the :ref:`User Guide <image_feature_extraction>`.
+
     Parameters
     ----------
     arr : ndarray

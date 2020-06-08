@@ -60,13 +60,3 @@ def test_spectral_mutual_information():
     smi_n = spectral_mutual_information(camera_image, camera_image_with_noise)
 
     assert smi_n < smi
-
-
-def test_joint_information():
-    camera_image = camera()
-    camera_image_with_noise = add_noise(camera())
-
-    ji = joint_information(camera_image, camera_image)
-    ji_n = joint_information(camera_image, camera_image_with_noise)
-
-    assert ji < ji_n
