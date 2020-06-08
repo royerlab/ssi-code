@@ -2,57 +2,10 @@ import numpy
 from skimage.data import binary_blobs
 
 from code.utils.array.nd import (
-    nd_range,
-    nd_range_bool_tuple,
-    nd_loop,
     nd_split_slices,
     remove_margin_slice,
-    nd_range_radii,
     extract_tiles,
 )
-
-
-def test_nd_range():
-    print(str(list(nd_range(-1, 1, 3))))
-    assert (
-            str(list(nd_range(-1, 1, 3)))
-            == "[(-1, -1, -1), (-1, -1, 0), (-1, 0, -1), (-1, 0, 0), (0, -1, -1), (0, -1, 0), (0, 0, -1), (0, 0, 0)]"
-    )
-
-
-def test_nd_range_radii():
-    radii = (1, 2)
-
-    print(str(list(nd_range_radii(radii))))
-
-    assert (
-            str(list(nd_range_radii(radii)))
-            == "[(-1, -2), (-1, -1), (-1, 0), (-1, 1), (-1, 2), (0, -2), (0, -1), (0, 0), (0, 1), (0, 2), (1, -2), (1, -1), (1, 0), (1, 1), (1, 2)]"
-    )
-
-
-def test_nd_range_bool_tuple():
-    print(str(list(nd_range_bool_tuple(-1, 1, (True, True, False)))))
-    assert (
-            str(list(nd_range_bool_tuple(-1, 1, (True, True, False))))
-            == "[(-1, -1, 0), (-1, 0, 0), (0, -1, 0), (0, 0, 0)]"
-    )
-
-    print(str(list(nd_range_bool_tuple(-1, 1, (False, True, False)))))
-    assert (
-            str(list(nd_range_bool_tuple(-1, 1, (False, True, False))))
-            == "[(0, -1, 0), (0, 0, 0)]"
-    )
-
-
-def test_nd_loop():
-    loop_tuple = (2, 1, 3, 5)
-
-    print(str(list(nd_loop(loop_tuple))))
-    assert (
-            str(list(nd_loop(loop_tuple)))
-            == "[(0, 0, 0, 0), (0, 0, 0, 1), (0, 0, 0, 2), (0, 0, 0, 3), (0, 0, 0, 4), (0, 0, 1, 0), (0, 0, 1, 1), (0, 0, 1, 2), (0, 0, 1, 3), (0, 0, 1, 4), (0, 0, 2, 0), (0, 0, 2, 1), (0, 0, 2, 2), (0, 0, 2, 3), (0, 0, 2, 4), (1, 0, 0, 0), (1, 0, 0, 1), (1, 0, 0, 2), (1, 0, 0, 3), (1, 0, 0, 4), (1, 0, 1, 0), (1, 0, 1, 1), (1, 0, 1, 2), (1, 0, 1, 3), (1, 0, 1, 4), (1, 0, 2, 0), (1, 0, 2, 1), (1, 0, 2, 2), (1, 0, 2, 3), (1, 0, 2, 4)]"
-    )
 
 
 def test_nd_split_slices():

@@ -1,6 +1,6 @@
 import pytest
 
-from code.util.log.log import lprint, lsection, Log
+from code.utils.log.log import lprint, lsection, Log
 
 
 @pytest.mark.heavy

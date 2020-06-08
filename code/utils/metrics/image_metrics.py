@@ -48,15 +48,6 @@ def spectral_mutual_information(image_a, image_b, normalised=True):
     )
 
 
-def joint_information(image_a, image_b, bins=256):
-    image_a = image_a.flatten()
-    image_b = image_b.flatten()
-
-    c_xy = numpy.histogram2d(image_a, image_b, bins)[0]
-    ji = joint_entropy_from_contingency(c_xy)
-    return ji
-
-
 def mutual_information(image_a, image_b, bins=256, normalised=True):
     image_a = image_a.flatten()
     image_b = image_b.flatten()
