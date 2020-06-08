@@ -48,5 +48,4 @@ TBD
 
 ## License
 
-TBD
-
+BSD 3-Clause
