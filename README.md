@@ -37,6 +37,10 @@ on your system for the later options.
 
 #### Run the demo:
 You can find the demo in `code/demo/demo.py`.
+You can run the demo by:
+```bash
+python -m code.demo.demo
+```
 
 ## How to cite this work?
 
