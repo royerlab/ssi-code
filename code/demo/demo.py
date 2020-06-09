@@ -16,7 +16,7 @@ generic_2d_mono_raw_folder = Path("code/benchmark/images/generic_2d_all")
 
 def get_benchmark_image(type, name):
     folder = generic_2d_mono_raw_folder / type
-    files = [f for f in folder.iterdir() if f.is_file() and name in f.name]
+    files = [f for f in folder.iterdir() if f.is_file()]
     filename = [f.name for f in files if name in f.name][0]
     filepath = folder / filename
     array = imread(filepath)
