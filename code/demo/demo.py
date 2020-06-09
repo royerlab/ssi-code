@@ -1,3 +1,4 @@
+import os
 import time
 from os import listdir
 from os.path import join, isfile
@@ -12,7 +13,8 @@ from code.utils.io.datasets import normalise, add_microscope_blur_2d, add_poisso
 from code.utils.metrics.image_metrics import psnr, spectral_mutual_information, mutual_information, ssim
 
 
-generic_2d_mono_raw_folder = '/home/acs/Dev/royerlab/ssi-code/code/benchmark/images/generic_2d_all'
+
+generic_2d_mono_raw_folder = join(os.path.dirname(os.path.abspath(__file__)), '../benchmark/images/generic_2d_all')
 
 
 def get_benchmark_image(type, name):
@@ -114,5 +116,5 @@ def demo(image_clipped):
 
 
 if __name__ == '__main__':
-    image, _ = get_benchmark_image('gt', 'mitochondria')
+    image, _ = get_benchmark_image('gt', 'drosophila')
     demo(image)

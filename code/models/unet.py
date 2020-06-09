@@ -42,9 +42,6 @@ class UNet(nn.Module):
 
         return x + x0 if self.residual else x
 
-    def enforce_blind_spot(self):
-        pass
-
     def post_optimisation(self):
         b = 1e-5
         if self.kernel_regularisation:
@@ -63,28 +60,6 @@ class UNet(nn.Module):
                 weights = F.conv2d(weights, self.kernel, groups=num_channels, padding=1)
                 self.outc.conv._parameters['weight'] = weights
 
-    def fill_blind_spot(self):
-
-        pass
-        # layer = self.inc.self.double_conv[0]
-        # weights = layer._parameters['weight']
-        # num_channels = weights.shape[1]
-        # original_sum = weights.sum()
-        # b = 1
-        # kernel = numpy.array([[b, b, b], [b, 0, b], [b, b, b]])
-        # kernel = kernel[numpy.newaxis, numpy.newaxis, ...].astype(numpy.float32)
-        # kernel = torch.from_numpy(kernel).to(weights.device)
-        # kernel /= kernel.sum()
-        # kernel = kernel.expand(num_channels, 1, -1, -1)
-        # filtered_weights = F.conv2d(weights, kernel, groups=num_channels, padding=1)
-        #
-        # indexes = tuple((i - 1) // 2 for i in layer.kernel_size)
-        # weights[:, :, indexes[0], indexes[1]] = filtered_weights[
-        #                                         :, :, indexes[0], indexes[1]
-        #                                         ]
-        # weights *= original_sum / weights.sum()
-        #
-        # layer._parameters['weight'] = weights
 
 
 class DoubleConv(nn.Module):

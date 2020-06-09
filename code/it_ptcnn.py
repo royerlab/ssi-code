@@ -76,7 +76,6 @@ class PTCNNImageTranslator(ImageTranslatorBase):
         self.reduce_lr_factor = 0.9
         self.masking = masking
         self.masking_density = masking_density
-        self.enforce_blind_spot = True
         self.optimiser_class = ESAdam
         self.max_tile_size = 1024  # TODO: adjust based on available memory
 
@@ -387,18 +386,6 @@ class PTCNNImageTranslator(ImageTranslatorBase):
                         # post optimisation -- if needed:
                         self.model.post_optimisation()
 
-                        # If self-supervised then enforce blind-spot:
-                        if self.self_supervised and self.enforce_blind_spot:
-                            try:
-                                self.model.enforce_blind_spot()
-                                lprint(
-                                    f"Post optimisation corrections applied to model"
-                                )
-                            except AttributeError:
-                                lprint(
-                                    f"NO post optimisation corrections applied to model"
-                                )
-
                         # update training loss_deconvolution for whole image:
                         train_loss_value += translation_loss_value.item()
                         iteration += 1
@@ -488,12 +475,6 @@ class PTCNNImageTranslator(ImageTranslatorBase):
         lprint(f"Reloading best models to date!")
         self.model.load_state_dict(best_model_state_dict)
 
-        if self.self_supervised and self.enforce_blind_spot:
-            try:
-                self.model.fill_blind_spot()
-                lprint(f"Blind spot filled!")
-            except AttributeError:
-                lprint(f"Blind spot NOT filled! (no method available)")
 
     def _additional_losses(self, translated_image, forward_model_image):
         return None

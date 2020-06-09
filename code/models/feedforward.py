@@ -50,5 +50,3 @@ class FeedForward(nn.Module):
     def post_optimisation(self):
         pass
 
-    def fill_blind_spot(self):
-        pass
