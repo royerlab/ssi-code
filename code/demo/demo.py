@@ -1,6 +1,5 @@
 import time
-from os import listdir
-from os.path import join, isfile
+from pathlib import Path
 import numpy
 from imageio import imread
 import napari
@@ -12,14 +11,14 @@ from code.utils.io.datasets import normalise, add_microscope_blur_2d, add_poisso
 from code.utils.metrics.image_metrics import psnr, spectral_mutual_information, mutual_information, ssim
 
 
-generic_2d_mono_raw_folder = '/home/acs/Dev/royerlab/ssi-code/code/benchmark/images/generic_2d_all'
+generic_2d_mono_raw_folder = Path("code/benchmark/images/generic_2d_all")
 
 
 def get_benchmark_image(type, name):
-    folder = join(generic_2d_mono_raw_folder, type)
-    files = [f for f in listdir(folder) if isfile(join(folder, f))]
-    filename = [f for f in files if name in f][0]
-    filepath = join(folder, filename)
+    folder = generic_2d_mono_raw_folder / type
+    files = [f for f in folder.iterdir() if f.is_file() and name in f.name]
+    filename = [f.name for f in files if name in f.name][0]
+    filepath = folder / filename
     array = imread(filepath)
     return array, filename
 
