@@ -38,7 +38,7 @@ $ pip install cupy-cuda102
 
 If you are using a conda environment:
 ```bash
-$ conda install cudatoolkit==CUDA_VERSION
+$ conda install cudatoolkit=CUDA_VERSION
 ```
 
 If you are NOT using a conda environment make 
