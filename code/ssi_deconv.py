@@ -8,16 +8,12 @@ from code.models.psf_convolution import PSFConvolutionLayer
 from code.utils.log.log import lprint
 
 
-def to_numpy(tensor):
-    return tensor.clone().detach().cpu().numpy()
-
-
-class PTCNNDeconvolution(PTCNNImageTranslator):
+class SSIDeconvolution(PTCNNImageTranslator):
     """
     Pytorch-based CNN image deconvolution
     """
 
-    def __init__(self, psf_kernel=None, broaden_psf=2, sharpening=0.1, bounds_loss=0.01, entropy=0.01, num_channels=1, **kwargs):
+    def __init__(self, psf_kernel=None, broaden_psf=1, sharpening=0, bounds_loss=0.1, entropy=0, num_channels=1, **kwargs):
         """
         Constructs a CNN image translator using the pytorch deep learning library.
 
@@ -65,7 +61,7 @@ class PTCNNDeconvolution(PTCNNImageTranslator):
 
         loss = 0
 
-        # non-negativity loss:
+        # Bounds loss:
         if self.bounds_loss and self.bounds_loss != 0:
             epsilon = 0 * 1e-8
             bounds_loss = F.relu(-translated_image - epsilon)
@@ -92,9 +88,6 @@ class PTCNNDeconvolution(PTCNNImageTranslator):
 
     def _forward_model(self, input):
         return self.psfconv(torch.clamp(input, 0, 1))
-
-    # def _translate(self, input_image,  image_slice=None, whole_image_shape=None):
-    #     return super()._translate(input_image, image_slice=image_slice, whole_image_shape=whole_image_shape).clip(0, 1)
 
 
 def entropy(image, normalise=True, epsilon=1e-10, clip=True):
