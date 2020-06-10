@@ -67,13 +67,15 @@ python -m code.demo.demo
 This should go fast if your GPU is reasonably recent.
 
 Once done, a [napari](https://napari.org/) window will open to let you compare
-the imagess. Please note that due to the stochastic nature of CNN training, and
+the images. Please note that due to the stochastic nature of CNN training, and
 because we use so little training data, and also because perhaps we have not fully
 understood how to train our nets, we occasionally observe failed runs.
 
-Things to observe: Varying the number of iterations for Lucy-Richardson (LR) lets you explore the trade-off between sharpness and noise reduction. Yet, LR has trouble to acheive both. In particular, you can see that the SMI (spectral mutual information) goes down dramatically as you go towards low iterations. That's because while you have good noise reduction, you loose fidelity inn the high-frequencies of the image. LR reconstructs images by first starting 
-with the low frequencies and then slowly refines the higher ones -- hat's when trouble arises and noise gets amplified. Different comparison metrics quantify different aspects of image similarity, SMI is good at telling us if the images are dissimilar (or similar) in the frequency domain.  SSI will acheive a good trade-off in comparison. 
+Things to observe: Varying the number of iterations for Lucy-Richardson (LR) lets you explore the trade-off between sharpness and noise reduction. Yet, LR has trouble to acheive both. In particular, you can see that the Spectral Mutual Information (SMI) goes down dramatically as you go towards low iterations, but the PSNR varies in the opposite way. That's because while you have good noise reduction at low iterations, you loose fidelity in the high-frequencies of the image. Why? LR reconstructs images by first starting with the low frequencies and then slowly refines the higher ones -- that's when trouble arises and noise gets amplified. Different comparison metrics quantify different aspects of image similarity, SMI (introduced in this paper) is good at telling us if the images are dissimilar (or similar) in the frequency domain. Our approach, Self-Supervised Inversion (SSI) will acheive a good trade-off in comparison. 
 
+## Feedback welcome!
+
+Feedback, pull-requests, and ideas to improve this work are very welcome and will be duly acknowledged.
 
 ## How to cite this work?
 
