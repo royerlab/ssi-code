@@ -12,12 +12,24 @@ Joshua Batson [@thebasepoint](https://twitter.com/thebasepoint)
 
 Loic A. Royer [@loicaroyer](https://twitter.com/loicaroyer)
 
+## Abstract
+
+We propose a general framework for solving inverse problems in the presence of noise that requires no signal prior, no noise estimate, and no clean training data. The only assumptions are that the forward model is available, differentiable and that the noise exhibits statistical independence across different measurement dimensions. We build upon the theory of 'J-invariant' functions  [Batson & Royer 2019](https://arxiv.org/abs/1901.11365) and show how self-supervised denoising \emph{à la} Noise2Self is a special case of learning a noise-tolerant pseudo-inverse of the identity. We demonstrate our approach by showing how a convolutional neural network can be taught in a self-supervised manner to deconvolve images and surpass in image quality classical inversion schemes such as Lucy-Richardson deconvolution.
+
 ## Get started
 
 ##### Get the project:
 ```bash
 $ git clone https://github.com/royerlab/ssi-code
 $ cd ssi-code
+```
+
+#### Setting up an environment:
+We recommend that you create a dedicated conda environment for SSI:
+
+```bash
+$ conda create --name ssi python=3.7
+$ conda activate ssi
 ```
 
 #### Install the generic dependencies:
@@ -52,12 +64,23 @@ You can run the demo by:
 python -m code.demo.demo
 ```
 
+This should go fast if your GPU is reasonably recent.
+
+Once done, a [napari](https://napari.org/) window will open to let you compare
+the imagess. Please note that due to the stochastic nature of CNN training, and
+because we use so little training data, and also because perhaps we have not fully
+understood how to train our nets, we occasionally observe failed runs.
+
+Things to observe: Varying the number of iterations for Lucy-Richardson (LR) lets you explore the trade-off between sharpness and noise reduction. Yet, LR has trouble to acheive both. In particular, you can see that the SMI (spectral mutual information) goes down dramatically as you go towards low iterations. That's because while you have good noise reduction, you loose fidelity inn the high-frequencies of the image. LR reconstructs images by first starting 
+with the low frequencies and then slowly refines the higher ones -- hat's when trouble arises and noise gets amplified. Different comparison metrics quantify different aspects of image similarity, SMI is good at telling us if the images are dissimilar (or similar) in the frequency domain.  SSI will acheive a good trade-off in comparison. 
+
+
 ## How to cite this work?
 
-Image Deconvolution via Noise-Tolerant Self-Supervised Inversion,
-Hirofumi Kobayashi, Ahmet Can Solak, Joshua Batson, Loic A. Royer,
+##### Image Deconvolution via Noise-Tolerant Self-Supervised Inversion.
+Hirofumi Kobayashi, Ahmet Can Solak, Joshua Batson, Loic A. Royer.
 
-Arxiv submission pending.
+arXiv submission pending.
 
 ## License
 
