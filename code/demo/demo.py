@@ -1,3 +1,4 @@
+import sys
 import time
 from pathlib import Path
 import numpy
@@ -147,12 +148,15 @@ def demo(image_clipped):
         viewer.add_image(lr_deconvolved_image_5_clipped, name='lr_deconvolved_image_5')
         viewer.add_image(lr_deconvolved_image_10_clipped, name='lr_deconvolved_image_10')
         viewer.add_image(lr_deconvolved_image_20_clipped, name='lr_deconvolved_image_20')
-        viewer.add_image(deconvolved_image, name='ssi_deconvolved_image')
+        viewer.add_image(deconvolved_image_clipped, name='ssi_deconvolved_image')
 
 
 
 
 
 if __name__ == '__main__':
-    image, _ = get_benchmark_image('gt', 'drosophila')
+    image_name = 'drosophila'
+    if len(sys.argv) > 1:
+        image_name = sys.argv[1].rstrip().lstrip()
+    image, _ = get_benchmark_image('gt', image_name)
     demo(image)
