@@ -9,7 +9,7 @@ from imageio import imread
 from skimage.transform import resize
 
 from code.benchmark.spectral import spectrum
-from code.it_ptcnn_deconv import PTCNNDeconvolution
+from code.ssi_deconv import SSIDeconvolution
 from code.lr_deconv import ImageTranslatorLRDeconv
 from code.models.unet import UNet
 from code.tv_restoration.chambole_pock import cp_restoration
@@ -27,7 +27,7 @@ def save_png(filepath, image):
 
 
 def restore_ssi(image, psf_kernel, masking=True):
-    it_deconv = PTCNNDeconvolution(
+    it_deconv = SSIDeconvolution(
         max_epochs=3000,
         patience=300,
         batch_size=8,
