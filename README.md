@@ -16,7 +16,7 @@ Loic A. Royer [@loicaroyer](https://twitter.com/loicaroyer)
 
 ## Abstract
 
-We propose a general framework for solving inverse problems in the presence of noise that requires no signal prior, no noise estimate, and no clean training data. The only assumptions are that the forward model is available, differentiable and that the noise exhibits statistical independence across different measurement dimensions. We build upon the theory of 'J-invariant' functions  [Batson & Royer 2019](https://arxiv.org/abs/1901.11365) and show how self-supervised denoising \emph{à la} Noise2Self is a special case of learning a noise-tolerant pseudo-inverse of the identity. We demonstrate our approach by showing how a convolutional neural network can be taught in a self-supervised manner to deconvolve images and surpass in image quality classical inversion schemes such as Lucy-Richardson deconvolution.
+We propose a general framework for solving inverse problems in the presence of noise that requires no signal prior, no noise estimate, and no clean training data. The only assumptions are that the forward model is available, differentiable and that the noise exhibits statistical independence across different measurement dimensions. We build upon the theory of 'J-invariant' functions  [Batson & Royer 2019](https://arxiv.org/abs/1901.11365) and show how self-supervised denoising *à la* Noise2Self is a special case of learning a noise-tolerant pseudo-inverse of the identity. We demonstrate our approach by showing how a convolutional neural network can be taught in a self-supervised manner to deconvolve images and surpass in image quality classical inversion schemes such as Lucy-Richardson deconvolution.
 
 ## Get started
 
