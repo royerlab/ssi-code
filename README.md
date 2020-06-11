@@ -1,3 +1,5 @@
+![](https://raw.githubusercontent.com/royerlab/ssi-code/master/videos/release/ssi-paper-release_twitter.gif)
+
 # Image Deconvolution via Noise-Tolerant Self-Supervised Inversion
 
 You can find the latest version of our full paper [here](https://royerlab.github.io/ssi-code/paper/Noise_Tolerant_Self_Supervised_Inversion.pdf).
