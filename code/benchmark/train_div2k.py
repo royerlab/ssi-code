@@ -4,7 +4,7 @@ import numpy
 import torch
 from tifffile import imread, imwrite
 
-from code.it_ptcnn_deconv import PTCNNDeconvolution
+from code.ssi_deconv import SSIDeconvolution
 from code.models.unet import UNet
 from code.utils.io.datasets import add_microscope_blur_2d, add_poisson_gaussian_noise
 
@@ -34,7 +34,7 @@ def demo(image):
         viewer.add_image(noisy_blurred_image, name='noisy_blurred_image')
         viewer.add_image(psf_kernel, name='psf_kernel')
 
-    it_deconv = PTCNNDeconvolution(
+    it_deconv = SSIDeconvolution(
         max_epochs=2000,
         patience=64,
         batch_size=1,

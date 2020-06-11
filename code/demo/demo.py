@@ -1,10 +1,11 @@
+import sys
 import time
 from pathlib import Path
 import numpy
 from imageio import imread
 import napari
 
-from code.it_ptcnn_deconv import PTCNNDeconvolution
+from code.ssi_deconv import SSIDeconvolution
 from code.lr_deconv import ImageTranslatorLRDeconv
 from code.models.unet import UNet
 from code.utils.io.datasets import normalise, add_microscope_blur_2d, add_poisson_gaussian_noise
@@ -35,26 +36,29 @@ def demo(image_clipped):
     noisy_blurred_image = add_poisson_gaussian_noise(blurred_image, alpha=0.001, sigma=0.1, sap=0.01, quant_bits=10)
 
     lr = ImageTranslatorLRDeconv(
-        psf_kernel=psf_kernel, max_num_iterations=30, backend="cupy"
+        psf_kernel=psf_kernel, backend="cupy"
     )
     lr.train(noisy_blurred_image)
-    lr_deconvolved_image = lr.translate(noisy_blurred_image)
+    lr.max_num_iterations=2
+    lr_deconvolved_image_2 = lr.translate(noisy_blurred_image)
+    lr.max_num_iterations=5
+    lr_deconvolved_image_5 = lr.translate(noisy_blurred_image)
+    lr.max_num_iterations=10
+    lr_deconvolved_image_10 = lr.translate(noisy_blurred_image)
+    lr.max_num_iterations=20
+    lr_deconvolved_image_20 = lr.translate(noisy_blurred_image)
 
-    it_deconv = PTCNNDeconvolution(
+    it_deconv = SSIDeconvolution(
         max_epochs=3000,
-        patience=100,
+        patience=300,
         batch_size=8,
         learning_rate=0.01,
         normaliser_type='identity',
         psf_kernel=psf_kernel,
         model_class=UNet,
         masking=True,
-        masking_density=0.05,
+        masking_density=0.01,
         loss='l2',
-        bounds_loss=0.1,
-        sharpening=0,
-        entropy=0,
-        broaden_psf=1
     )
 
     start = time.time()
@@ -68,7 +72,10 @@ def demo(image_clipped):
     print(f"inference: elapsed time:  {stop - start} ")
 
     image_clipped = numpy.clip(image_clipped, 0, 1)
-    lr_deconvolved_image_clipped = numpy.clip(lr_deconvolved_image, 0, 1)
+    lr_deconvolved_image_2_clipped = numpy.clip(lr_deconvolved_image_2, 0, 1)
+    lr_deconvolved_image_5_clipped = numpy.clip(lr_deconvolved_image_5, 0, 1)
+    lr_deconvolved_image_10_clipped = numpy.clip(lr_deconvolved_image_10, 0, 1)
+    lr_deconvolved_image_20_clipped = numpy.clip(lr_deconvolved_image_20, 0, 1)
     deconvolved_image_clipped = numpy.clip(deconvolved_image, 0, 1)
 
     print("Below in order: PSNR, norm spectral mutual info, norm mutual info, SSIM: ")
@@ -89,11 +96,35 @@ def demo(image_clipped):
     )
 
     printscore(
-        "lr deconv             :    ",
-        psnr(image_clipped, lr_deconvolved_image_clipped),
-        spectral_mutual_information(image_clipped, lr_deconvolved_image_clipped),
-        mutual_information(image_clipped, lr_deconvolved_image_clipped),
-        ssim(image_clipped, lr_deconvolved_image_clipped),
+        "lr deconv (n=2)       :    ",
+        psnr(image_clipped, lr_deconvolved_image_2_clipped),
+        spectral_mutual_information(image_clipped, lr_deconvolved_image_2_clipped),
+        mutual_information(image_clipped, lr_deconvolved_image_2_clipped),
+        ssim(image_clipped, lr_deconvolved_image_2_clipped),
+    )
+
+    printscore(
+        "lr deconv (n=5)       :    ",
+        psnr(image_clipped, lr_deconvolved_image_5_clipped),
+        spectral_mutual_information(image_clipped, lr_deconvolved_image_5_clipped),
+        mutual_information(image_clipped, lr_deconvolved_image_5_clipped),
+        ssim(image_clipped, lr_deconvolved_image_5_clipped),
+    )
+
+    printscore(
+        "lr deconv (n=10)      :    ",
+        psnr(image_clipped, lr_deconvolved_image_10_clipped),
+        spectral_mutual_information(image_clipped, lr_deconvolved_image_10_clipped),
+        mutual_information(image_clipped, lr_deconvolved_image_10_clipped),
+        ssim(image_clipped, lr_deconvolved_image_10_clipped),
+    )
+
+    printscore(
+        "lr deconv (n=20)      :    ",
+        psnr(image_clipped, lr_deconvolved_image_20_clipped),
+        spectral_mutual_information(image_clipped, lr_deconvolved_image_20_clipped),
+        mutual_information(image_clipped, lr_deconvolved_image_20_clipped),
+        ssim(image_clipped, lr_deconvolved_image_20_clipped),
     )
 
     printscore(
@@ -104,15 +135,28 @@ def demo(image_clipped):
         ssim(image_clipped, deconvolved_image_clipped),
     )
 
+    print("NOTE: if you get a bad results for ssi, blame stochastic optimisation and retry...")
+    print("      The training is done on the same exact image that we infer on, very few pixels...")
+    print("      Training should be more stable given more data...")
+
     with napari.gui_qt():
         viewer = napari.Viewer()
         viewer.add_image(image, name='image')
         viewer.add_image(blurred_image, name='blurred')
         viewer.add_image(noisy_blurred_image, name='noisy_blurred_image')
-        viewer.add_image(lr_deconvolved_image, name='lr_deconvolved_image')
-        viewer.add_image(deconvolved_image, name='ssi_deconvolved_image')
+        viewer.add_image(lr_deconvolved_image_2_clipped, name='lr_deconvolved_image_2')
+        viewer.add_image(lr_deconvolved_image_5_clipped, name='lr_deconvolved_image_5')
+        viewer.add_image(lr_deconvolved_image_10_clipped, name='lr_deconvolved_image_10')
+        viewer.add_image(lr_deconvolved_image_20_clipped, name='lr_deconvolved_image_20')
+        viewer.add_image(deconvolved_image_clipped, name='ssi_deconvolved_image')
+
+
+
 
 
 if __name__ == '__main__':
-    image, _ = get_benchmark_image('gt', 'drosophila')
+    image_name = 'drosophila'
+    if len(sys.argv) > 1:
+        image_name = sys.argv[1].rstrip().lstrip()
+    image, _ = get_benchmark_image('gt', image_name)
     demo(image)

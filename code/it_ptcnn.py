@@ -10,6 +10,7 @@ from torch.utils.data import Dataset
 from code.base import ImageTranslatorBase
 from code.models.feedforward import FeedForward
 from code.models.masking import Masking
+from code.models.unet import UNet
 from code.optimisers.esadam import ESAdam
 from code.utils.array.nd import extract_tiles
 from code.utils.log.log import lprint, lsection
@@ -26,12 +27,12 @@ class PTCNNImageTranslator(ImageTranslatorBase):
 
     def __init__(
             self,
-            max_epochs=1024,
+            max_epochs=2048,
             patience=None,
             patience_epsilon=0.0,
-            learning_rate=0.02,
-            batch_size=64,
-            model_class=FeedForward,
+            learning_rate=0.01,
+            batch_size=8,
+            model_class=UNet,
             masking=True,
             masking_density=0.01,
             loss='l1',
