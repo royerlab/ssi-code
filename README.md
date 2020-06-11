@@ -64,6 +64,13 @@ You can run the demo by:
 python -m code.demo.demo
 ```
 
+You can also change the image to run the demo with:
+```bash
+python -m code.demo.demo characters
+```
+We recommend to trythe following images: 'drosophila' (default), 'usaf', 'characters'.
+
+
 This should go fast if your GPU is reasonably recent.
 
 Once done, a [napari](https://napari.org/) window will open to let you compare
