@@ -64,13 +64,6 @@ You can run the demo by:
 python -m code.demo.demo
 ```
 
-You can also change the image to run the demo with:
-```bash
-python -m code.demo.demo characters
-```
-We recommend to trythe following images: 'drosophila' (default), 'usaf', 'characters'.
-
-
 This should go fast if your GPU is reasonably recent.
 
 Once done, a [napari](https://napari.org/) window will open to let you compare
@@ -79,6 +72,15 @@ because we use so little training data, and also because perhaps we have not ful
 understood how to train our nets, we occasionally observe failed runs.
 
 Things to observe: Varying the number of iterations for Lucy-Richardson (LR) lets you explore the trade-off between sharpness and noise reduction. Yet, LR has trouble to acheive both. In particular, you can see that the Spectral Mutual Information (SMI) goes down dramatically as you go towards low iterations, but the PSNR varies in the opposite way. That's because while you have good noise reduction at low iterations, you loose fidelity in the high-frequencies of the image. Why? LR reconstructs images by first starting with the low frequencies and then slowly refines the higher ones -- that's when trouble arises and noise gets amplified. Different comparison metrics quantify different aspects of image similarity, SMI (introduced in this paper) is good at telling us if the images are dissimilar (or similar) in the frequency domain. Our approach, Self-Supervised Inversion (SSI) will acheive a good trade-off in comparison. 
+
+
+You can also try other images with:
+```bash
+python -m code.demo.demo characters
+```
+
+We recommend to try the following images: 'drosophila' (default), 'usaf', 'characters'.
+
 
 ## Feedback welcome!
 
