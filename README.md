@@ -90,10 +90,10 @@ Feedback, pull-requests, and ideas to improve this work are very welcome and wil
 
 ## How to cite this work?
 
-##### Image Deconvolution via Noise-Tolerant Self-Supervised Inversion.
-Hirofumi Kobayashi, Ahmet Can Solak, Joshua Batson, Loic A. Royer.
+[Image Deconvolution via Noise-Tolerant Self-Supervised Inversion.](http://arxiv.org/abs/2006.06156)
+Hirofumi Kobayashi, Ahmet Can Solak, Joshua Batson, Loic A. Royer. arXiv 2020.
 
-arXiv submission pending.
+[arxiv.org/abs/2006.06156](http://arxiv.org/abs/2006.06156)
 
 ## License
 
