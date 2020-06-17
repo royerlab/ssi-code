@@ -1,10 +1,11 @@
 import numpy
 import torch
 import torch.nn.functional as F
+from scipy.ndimage import convolve
 from scipy.signal import convolve2d
 
 from code.it_ptcnn import PTCNNImageTranslator
-from code.models.psf_convolution import PSFConvolutionLayer
+from code.models.psf_convolution import PSFConvolutionLayer2D, PSFConvolutionLayer3D
 from code.utils.log.log import lprint
 
 
@@ -13,7 +14,7 @@ class SSIDeconvolution(PTCNNImageTranslator):
     Pytorch-based CNN image deconvolution
     """
 
-    def __init__(self, psf_kernel=None, broaden_psf=1, sharpening=0, bounds_loss=0.1, entropy=0, num_channels=1, **kwargs):
+    def __init__(self, psf_kernel=None, broaden_psf=1, sharpening=0, bounds_loss=0.1, entropy=0, **kwargs):
         """
         Constructs a CNN image translator using the pytorch deep learning library.
 
@@ -23,31 +24,53 @@ class SSIDeconvolution(PTCNNImageTranslator):
         """
         super().__init__(**kwargs)
 
-        for i in range(broaden_psf):
-            psf_kernel = numpy.pad(psf_kernel, (1,), mode='constant', constant_values=0)
-            broaden_kernel = numpy.array([[0.095, 0.14, 0.095], [0.11, 0.179, 0.11], [0.095, 0.14, 0.095]])
-            broaden_kernel = broaden_kernel / broaden_kernel.sum()
-            psf_kernel = convolve2d(
-                psf_kernel,
+        self.provided_psf_kernel = psf_kernel
+        self.broaden_psf = broaden_psf
+        self.sharpening = sharpening
+        self.bounds_loss = bounds_loss
+        self.entropy = entropy
+
+    def _train(self, input_image, target_image, train_valid_ratio=0.1, callback_period=3, jinv=False):
+
+        ndim = input_image.ndim-2
+        num_channels = input_image.shape[1]
+
+        self.psf_kernel = self.provided_psf_kernel
+
+        for i in range(self.broaden_psf):
+
+            self.psf_kernel = numpy.pad(self.psf_kernel, (1,), mode='constant', constant_values=0)
+
+            broadening_kernel = None
+            if ndim==2:
+                broadening_kernel = numpy.array([[0.095, 0.14, 0.095], [0.14, 0.2, 0.14], [0.095, 0.14, 0.095]])
+            elif ndim==3:
+                broadening_kernel = numpy.array([[[0.095, 0.095, 0.095], [0.095, 0.14, 0.095], [0.095, 0.095, 0.095]],
+                                              [[0.095,  0.14, 0.095], [0.14,   0.2, 0.14 ], [0.095,  0.14, 0.095]],
+                                              [[0.095, 0.095, 0.095], [0.095, 0.14, 0.095], [0.095, 0.095, 0.095]]])
+
+            broaden_kernel = broadening_kernel / broadening_kernel.sum()
+            self.psf_kernel = convolve(
+                self.psf_kernel,
                 broaden_kernel,
-                'same',
+                mode='constant',
             )
 
-        psf_kernel /= psf_kernel.sum()
-        psf_kernel = psf_kernel.astype(numpy.float32)
+        self.psf_kernel /= self.psf_kernel.sum()
+        self.psf_kernel = self.psf_kernel.astype(numpy.float32)
 
-        self.psf_kernel = psf_kernel
+        self.psf_kernel = self.psf_kernel
         self.psf_kernel_tensor = torch.from_numpy(
             self.psf_kernel[numpy.newaxis, numpy.newaxis, ...]
         ).to(self.device)
 
-        self.psfconv = PSFConvolutionLayer(self.psf_kernel, num_channels=num_channels).to(self.device)
+        if ndim==2:
+            self.psfconv = PSFConvolutionLayer2D(self.psf_kernel, num_channels=num_channels).to(self.device)
+        elif ndim==3:
+            self.psfconv = PSFConvolutionLayer3D(self.psf_kernel, num_channels=num_channels).to(self.device)
 
-        self.enforce_blind_spot = False
+        super()._train(input_image, target_image, train_valid_ratio, callback_period, jinv)
 
-        self.sharpening = sharpening
-        self.bounds_loss = bounds_loss
-        self.entropy = entropy
 
     def _train_loop(self, data_loader, optimizer, loss_function):
         try:
