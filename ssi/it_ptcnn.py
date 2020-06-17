@@ -1,6 +1,7 @@
 import math
 from collections import OrderedDict
 from itertools import chain
+
 import numpy
 import torch
 from torch import nn
@@ -8,7 +9,6 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import Dataset
 
 from ssi.base import ImageTranslatorBase
-from ssi.models.feedforward import FeedForward
 from ssi.models.masking import Masking
 from ssi.models.unet import UNet
 from ssi.optimisers.esadam import ESAdam
@@ -142,7 +142,7 @@ class PTCNNImageTranslator(ImageTranslatorBase):
         )
 
         # Model
-        self.model = self.model_class(num_input_channels, num_output_channels).to(self.device)
+        self.model = self.model_class(num_input_channels, num_output_channels, ndim=num_spatiotemp_dim).to(self.device)
 
         number_of_parameters = sum(
             p.numel() for p in self.model.parameters() if p.requires_grad

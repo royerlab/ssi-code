@@ -94,7 +94,7 @@ def add_microscope_blur_2d(image, dz=0, multi_channel=False):
         return conv(image), psf_kernel
 
 
-def add_blur_3d(image):
+def add_microscope_blur_3d(image):
     psf = SimpleMicroscopePSF()
     psf_xyz_array = psf.generate_xyz_psf(dxy=0.406, dz=0.406, xy_size=17, z_size=17)
     psf_kernel = psf_xyz_array
