@@ -12,7 +12,7 @@ from ssi.utils.io.datasets import normalise, add_microscope_blur_2d, add_poisson
 from ssi.utils.metrics.image_metrics import psnr, spectral_mutual_information, mutual_information, ssim
 
 
-generic_2d_mono_raw_folder = Path("code/benchmark/images/generic_2d_all")
+generic_2d_mono_raw_folder = Path("ssi/benchmark/images/generic_2d_all")
 
 
 def get_benchmark_image(type, name):
