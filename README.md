@@ -80,7 +80,7 @@ Things to observe: Varying the number of iterations for Lucy-Richardson (LR) let
 
 You can also try other images with:
 ```bash
-python -m code.demo.demo characters
+python -m code.demo.demo2D characters
 ```
 
 We recommend to try the following images: 'drosophila' (default), 'usaf', 'characters'.
