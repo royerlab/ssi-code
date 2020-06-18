@@ -60,10 +60,12 @@ sure you have all CUDA drivers installed properly
 on your system for the later options.
 
 #### Run the demo:
-You can find the demo in `code/demo/demo.py`.
-You can run the demo by:
+You can find the demos in `code/demo/demo2D.py` and 
+`code/demo/demo3D.py` files.
+You can run the demos by:
 ```bash
-python -m code.demo.demo
+python -m code.demo.demo2D
+python -m code.demo.demo3D
 ```
 
 This should go fast if your GPU is reasonably recent.
